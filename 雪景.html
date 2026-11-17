@@ -5,92 +5,146 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0c1a28" />
   <title>雪景</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #0b1520;
-      --ink: #e8f0f7;
-      --dim: #9bb0c4;
-      --line: rgba(158, 201, 232, 0.28);
-      --accent: #c9e4f7;
-      --panel: rgba(10, 22, 34, 0.88);
-      --danger: #ff8a9b;
+      --night: #0a1622;
+      --night-2: #122536;
+      --mist: #7f9bb0;
+      --frost: #d7ebf7;
+      --ice: #9fc4dc;
+      --line: rgba(180, 214, 235, 0.22);
+      --panel: rgba(8, 20, 32, 0.78);
+      --danger: #e8919a;
+      --ok: #b7d7ea;
+      --safe-top: max(12px, env(safe-area-inset-top));
+      --safe-bot: max(14px, env(safe-area-inset-bottom));
     }
+
     * { box-sizing: border-box; }
+
     html, body {
       margin: 0;
       height: 100%;
-      background: linear-gradient(165deg, #0b1520, #152536 50%, #0d1a28);
-      color: var(--ink);
-      font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+      color: var(--frost);
+      font-family: "Manrope", "PingFang SC", sans-serif;
       -webkit-tap-highlight-color: transparent;
       overflow: hidden;
+      background:
+        radial-gradient(900px 520px at 18% -8%, rgba(120, 168, 204, 0.28), transparent 58%),
+        radial-gradient(700px 480px at 92% 8%, rgba(64, 110, 148, 0.22), transparent 52%),
+        linear-gradient(168deg, #07131d 0%, var(--night-2) 46%, #0b1824 100%);
     }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.35;
+      background-image:
+        radial-gradient(1.2px 1.2px at 12% 18%, rgba(255,255,255,.55), transparent),
+        radial-gradient(1px 1px at 28% 42%, rgba(255,255,255,.4), transparent),
+        radial-gradient(1.4px 1.4px at 61% 14%, rgba(255,255,255,.5), transparent),
+        radial-gradient(1px 1px at 78% 36%, rgba(255,255,255,.35), transparent),
+        radial-gradient(1.2px 1.2px at 88% 72%, rgba(255,255,255,.45), transparent),
+        radial-gradient(1px 1px at 42% 78%, rgba(255,255,255,.3), transparent);
+      animation: starDrift 18s linear infinite;
+    }
+
     .app {
+      position: relative;
+      z-index: 1;
       height: 100%;
       display: flex;
       flex-direction: column;
+      max-width: 920px;
+      margin: 0 auto;
     }
+
     .top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 12px 14px max(10px, env(safe-area-inset-top));
       flex-shrink: 0;
+      padding: var(--safe-top) 18px 10px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      animation: riseIn 0.7s ease both;
     }
+
+    .brand-block { min-width: 0; }
+
     .brand {
-      font-size: 1.35rem;
-      font-weight: 700;
-      letter-spacing: 0.18em;
+      margin: 0;
+      font-family: "Fraunces", "Songti SC", serif;
+      font-weight: 650;
+      font-size: clamp(2rem, 7vw, 2.75rem);
+      letter-spacing: 0.22em;
+      line-height: 1;
+      color: #f3f8fc;
     }
-    .hint {
-      font-size: 0.75rem;
-      color: var(--dim);
-      max-width: 58%;
-      text-align: right;
-      line-height: 1.35;
+
+    .brand span {
+      display: inline-block;
+      animation: softBob 4.8s ease-in-out infinite;
     }
+
+    .tag {
+      margin: 8px 0 0;
+      color: var(--mist);
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    .help-link {
+      flex-shrink: 0;
+      border: 0;
+      background: transparent;
+      color: var(--ice);
+      font: inherit;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      padding: 0.4rem 0;
+      opacity: 0.85;
+    }
+
     .stage-wrap {
       flex: 1;
       min-height: 0;
-      padding: 0 12px;
+      padding: 6px 14px 0;
       display: flex;
+      animation: riseIn 0.85s ease 0.08s both;
     }
+
     .stage {
       position: relative;
       flex: 1;
       min-height: 0;
       overflow: hidden;
-      background: #081018;
-      box-shadow: 0 18px 50px rgba(0,0,0,.45);
       touch-action: none;
+      background:
+        linear-gradient(180deg, rgba(18, 40, 58, 0.55), rgba(8, 16, 26, 0.2)),
+        radial-gradient(120% 80% at 50% 100%, rgba(150, 190, 220, 0.12), transparent 55%),
+        #08121c;
+      border: 1px solid var(--line);
+      box-shadow: 0 28px 60px rgba(0, 0, 0, 0.35);
     }
-    .placeholder {
+
+    .stage::after {
+      content: "";
       position: absolute;
       inset: 0;
-      z-index: 3;
-      display: grid;
-      place-content: center;
-      gap: 10px;
-      text-align: center;
-      padding: 24px;
-      background: rgba(8,16,24,.55);
+      pointer-events: none;
+      z-index: 4;
+      box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.28);
     }
-    .placeholder p { margin: 0; }
-    .placeholder .t { font-size: 1.15rem; letter-spacing: .08em; }
-    .placeholder .s { color: var(--dim); font-size: .9rem; }
-    .pick {
-      margin-top: 8px;
-      justify-self: center;
-      padding: .75rem 1.35rem;
-      border: 1px solid var(--line);
-      background: rgba(158,201,232,.12);
-      color: var(--accent);
-      font: inherit;
-      font-size: .95rem;
-      border-radius: 0;
-    }
+
     #view {
       position: absolute;
       inset: 0;
@@ -99,144 +153,297 @@
       display: block;
       z-index: 1;
     }
+
+    .placeholder {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      display: grid;
+      place-content: center;
+      gap: 8px;
+      text-align: center;
+      padding: 28px 22px;
+      background:
+        linear-gradient(180deg, rgba(10, 24, 38, 0.25), rgba(8, 16, 26, 0.55)),
+        radial-gradient(ellipse 90% 55% at 50% 110%, rgba(170, 205, 230, 0.16), transparent 60%);
+    }
+
+    .placeholder[hidden] { display: none !important; }
+
+    .placeholder .mark {
+      width: 10px;
+      height: 10px;
+      margin: 0 auto 10px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #fff, rgba(200, 230, 255, 0.8) 45%, transparent 70%);
+      animation: softBob 3.6s ease-in-out infinite;
+    }
+
+    .placeholder .t {
+      margin: 0;
+      font-family: "Fraunces", "Songti SC", serif;
+      font-size: clamp(1.2rem, 4.5vw, 1.55rem);
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      color: #f4f8fb;
+    }
+
+    .placeholder .s {
+      margin: 0 0 18px;
+      color: var(--mist);
+      font-size: 0.9rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+    }
+
+    .pick {
+      justify-self: center;
+      padding: 0.85rem 1.5rem;
+      border: 1px solid rgba(200, 230, 255, 0.4);
+      background: linear-gradient(180deg, rgba(190, 220, 240, 0.18), rgba(140, 180, 210, 0.08));
+      color: #f5faff;
+      font: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .pick:active { transform: scale(0.98); }
+
     .bar {
       flex-shrink: 0;
-      padding: 12px 12px max(14px, env(safe-area-inset-bottom));
+      margin-top: 12px;
+      padding: 14px 14px var(--safe-bot);
       display: grid;
-      gap: 10px;
-      background: var(--panel);
+      gap: 12px;
+      background:
+        linear-gradient(180deg, rgba(14, 28, 42, 0.55), var(--panel));
       border-top: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      animation: riseIn 0.9s ease 0.14s both;
     }
+
     .row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
     }
+
     .btn {
       appearance: none;
       border: 1px solid var(--line);
-      background: rgba(158,201,232,.08);
-      color: var(--ink);
+      background: rgba(160, 200, 225, 0.07);
+      color: var(--frost);
       font: inherit;
-      font-size: .82rem;
-      padding: .7rem .4rem;
-      letter-spacing: .04em;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 0.78rem 0.35rem;
+      letter-spacing: 0.06em;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
     }
-    .btn:active { background: rgba(158,201,232,.2); }
+
+    .btn:active {
+      transform: translateY(1px);
+      background: rgba(160, 200, 225, 0.16);
+    }
+
     .btn.primary {
-      background: rgba(180,220,255,.2);
-      border-color: rgba(200,230,255,.45);
+      background: linear-gradient(180deg, rgba(210, 232, 245, 0.28), rgba(150, 190, 220, 0.14));
+      border-color: rgba(210, 235, 250, 0.45);
       color: #fff;
+      font-weight: 600;
     }
+
     .btn.danger {
-      border-color: rgba(255,138,155,.45);
+      border-color: rgba(232, 145, 154, 0.55);
       color: var(--danger);
+      background: rgba(232, 145, 154, 0.08);
     }
-    .btn:disabled { opacity: .45; }
+
     .sliders {
       display: grid;
-      gap: 8px;
+      gap: 10px;
     }
+
     .slider {
       display: grid;
-      grid-template-columns: 56px 1fr 36px;
+      grid-template-columns: 42px 1fr 34px;
       align-items: center;
-      gap: 8px;
-      font-size: .78rem;
-      color: var(--dim);
+      gap: 10px;
+      font-size: 0.76rem;
+      color: var(--mist);
+      letter-spacing: 0.04em;
     }
+
     .slider output {
       text-align: right;
-      color: var(--accent);
+      color: var(--ok);
       font-variant-numeric: tabular-nums;
+      font-weight: 600;
     }
+
     input[type="range"] {
       -webkit-appearance: none;
       appearance: none;
       width: 100%;
-      height: 3px;
-      background: rgba(158,201,232,.25);
-      border-radius: 99px;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(150, 190, 220, 0.15), rgba(190, 220, 240, 0.4));
       outline: none;
     }
+
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 15px;
+      height: 15px;
       border-radius: 50%;
-      background: var(--accent);
+      background: #eef6fb;
+      border: 1px solid rgba(180, 210, 230, 0.65);
+      box-shadow: 0 0 0 4px rgba(160, 200, 230, 0.12);
     }
+
     .status {
-      min-height: 1.1em;
-      font-size: .78rem;
-      color: var(--dim);
+      min-height: 1.15em;
+      font-size: 0.76rem;
+      color: var(--mist);
       text-align: center;
+      letter-spacing: 0.02em;
     }
-    .status.rec { color: var(--danger); }
+
+    .status.rec {
+      color: var(--danger);
+      animation: pulseText 1.2s ease-in-out infinite;
+    }
+
     body.is-present .top,
     body.is-present .bar { display: none; }
+
     body.is-present .stage-wrap { padding: 0; }
-    body.is-present .stage { box-shadow: none; }
+
+    body.is-present .stage {
+      border: 0;
+      box-shadow: none;
+    }
+
+    body.is-present .stage::after { display: none; }
+
     .present-exit {
       display: none;
       position: fixed;
-      right: 12px;
-      top: max(12px, env(safe-area-inset-top));
+      right: 14px;
+      top: var(--safe-top);
       z-index: 20;
       border: 1px solid var(--line);
-      background: rgba(0,0,0,.45);
+      background: rgba(8, 16, 26, 0.55);
       color: #fff;
-      padding: .55rem .8rem;
+      padding: 0.55rem 0.85rem;
       font: inherit;
-      font-size: .8rem;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      backdrop-filter: blur(10px);
     }
+
     body.is-present .present-exit { display: block; }
+
     #fileInput { display: none; }
+
     .sheet {
       display: none;
       position: fixed;
       inset: 0;
       z-index: 30;
-      background: rgba(0,0,0,.55);
-      padding: 24px 16px;
+      background: rgba(4, 10, 16, 0.62);
+      padding: 24px 16px var(--safe-bot);
       align-items: end;
       justify-content: center;
+      backdrop-filter: blur(6px);
     }
+
     .sheet.show { display: flex; }
+
     .sheet-card {
-      width: min(420px, 100%);
-      background: #122233;
+      width: min(440px, 100%);
+      background:
+        radial-gradient(80% 60% at 20% 0%, rgba(140, 180, 210, 0.16), transparent 55%),
+        linear-gradient(180deg, #15293a, #101f2c);
       border: 1px solid var(--line);
-      padding: 18px 16px 16px;
+      padding: 22px 18px 16px;
+      animation: sheetUp 0.35s ease both;
     }
+
     .sheet-card h2 {
-      margin: 0 0 10px;
-      font-size: 1.05rem;
-      letter-spacing: .06em;
+      margin: 0 0 12px;
+      font-family: "Fraunces", "Songti SC", serif;
+      font-size: 1.25rem;
+      font-weight: 650;
+      letter-spacing: 0.12em;
     }
+
     .sheet-card ol {
-      margin: 0 0 14px;
-      padding-left: 1.2em;
-      color: var(--dim);
-      font-size: .88rem;
-      line-height: 1.55;
+      margin: 0 0 16px;
+      padding-left: 1.15em;
+      color: var(--mist);
+      font-size: 0.88rem;
+      line-height: 1.65;
     }
-    .sheet-card .btn { width: 100%; }
+
+    .sheet-card .btn { width: 100%; padding: 0.85rem; }
+
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes softBob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(3px); }
+    }
+
+    @keyframes starDrift {
+      from { transform: translateY(0); }
+      to { transform: translateY(18px); }
+    }
+
+    @keyframes pulseText {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.55; }
+    }
+
+    @keyframes sheetUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (min-width: 780px) {
+      .app { padding-top: 8px; }
+      .stage-wrap { padding: 8px 20px 0; }
+      .bar {
+        margin: 14px 20px var(--safe-bot);
+        border: 1px solid var(--line);
+        border-top: 1px solid var(--line);
+      }
+      .top { padding-left: 20px; padding-right: 20px; }
+    }
   </style>
 </head>
 <body>
   <div class="app">
     <header class="top">
-      <div class="brand">雪景</div>
-      <p class="hint">上传照片 → 调雪 → 录制或全屏系统录屏</p>
+      <div class="brand-block">
+        <h1 class="brand"><span>雪</span>景</h1>
+        <p class="tag">把落雪铺在你的画面上</p>
+      </div>
+      <button class="help-link" type="button" id="openHelp">用法</button>
     </header>
 
     <div class="stage-wrap">
       <div class="stage" id="stage">
         <canvas id="view"></canvas>
         <div class="placeholder" id="placeholder">
-          <p class="t">放一张照片或视频</p>
-          <p class="s">雪花会在上层飘落</p>
+          <div class="mark" aria-hidden="true"></div>
+          <p class="t">放一张照片</p>
+          <p class="s">雪会在上层轻轻落下</p>
           <button class="pick" type="button" id="pickBtn">从相册选择</button>
         </div>
       </div>
@@ -252,10 +459,10 @@
       <div class="sliders">
         <label class="slider">雪量 <input id="count" type="range" min="40" max="360" value="180" /><output id="countOut">180</output></label>
         <label class="slider">速度 <input id="speed" type="range" min="0.3" max="2.2" step="0.1" value="0.85" /><output id="speedOut">0.9</output></label>
-        <label class="slider">风 <input id="wind" type="range" min="-2" max="2" step="0.1" value="0.25" /><output id="windOut">0.3</output></label>
+        <label class="slider">风向 <input id="wind" type="range" min="-2" max="2" step="0.1" value="0.25" /><output id="windOut">0.3</output></label>
         <label class="slider">大小 <input id="size" type="range" min="0.5" max="2" step="0.1" value="1" /><output id="sizeOut">1.0</output></label>
       </div>
-      <div class="status" id="status">录制约 6 秒，会下载成视频到相册/文件</div>
+      <div class="status" id="status">录制约 6 秒，完成后可保存到相册</div>
     </div>
   </div>
 
@@ -264,15 +471,14 @@
 
   <div class="sheet" id="helpSheet">
     <div class="sheet-card">
-      <h2>怎么放到手机上用</h2>
+      <h2>怎么用</h2>
       <ol>
-        <li>只需要这一个文件：<b>雪景.html</b></li>
-        <li>用隔空投送 / 微信 / 网盘发到手机</li>
-        <li>用 Safari 或 Chrome 打开（微信里可点「在浏览器打开」）</li>
-        <li>点「换图」选照片 → 调雪量 → 点「录制」</li>
-        <li>若录制失败（部分 iPhone）：点「全屏」，再用系统录屏</li>
+        <li>点「换图」从相册选照片或视频</li>
+        <li>拖动滑条调节雪量、速度与风向</li>
+        <li>点「录制」导出约 6 秒成片</li>
+        <li>若 iPhone 录制失败：点「全屏」，再用系统屏幕录制</li>
       </ol>
-      <button class="btn primary" type="button" id="closeHelp">知道了</button>
+      <button class="btn primary" type="button" id="closeHelp">开始</button>
     </div>
   </div>
 
@@ -299,7 +505,7 @@
     mediaVideo.setAttribute("playsinline", "");
     mediaVideo.setAttribute("webkit-playsinline", "");
 
-    let mediaType = null; // 'image' | 'video'
+    let mediaType = null;
     let objectUrl = null;
     let flakes = [];
     let w = 0, h = 0, dpr = 1;
@@ -321,7 +527,6 @@
     function createFlake(fromTop) {
       const layer = pickLayer();
       const sizeScale = Number(sizeInput.value);
-      // Almost all soft dots; only occasionally a crystal flake
       const kind = Math.random() < 0.012 ? "crystal" : "dot";
       const r = kind === "crystal"
         ? rand(3.2, 7.5 + layer * 5) * sizeScale
@@ -375,7 +580,7 @@
     }
 
     function drawMedia() {
-      ctx.fillStyle = "#081018";
+      ctx.fillStyle = "#08121c";
       ctx.fillRect(0, 0, w, h);
       if (mediaType === "image" && mediaImg.complete && mediaImg.naturalWidth) {
         drawCover(mediaImg, mediaImg.naturalWidth, mediaImg.naturalHeight);
@@ -426,7 +631,6 @@
         ctx.moveTo(0, 0);
         ctx.lineTo(0, -arm);
         ctx.stroke();
-        // side branches
         const b1 = arm * 0.42;
         const b2 = arm * 0.68;
         ctx.beginPath();
@@ -508,7 +712,7 @@
         mediaImg.src = objectUrl;
       }
       placeholder.hidden = true;
-      statusEl.textContent = "已加载，可调雪后点「录制」";
+      statusEl.textContent = "已加载，调好雪后点「录制」";
       statusEl.classList.remove("rec");
     }
 
@@ -527,17 +731,13 @@
       return "";
     }
 
-    function stopRecord(save) {
+    function stopRecord() {
       if (recordTimer) {
         clearTimeout(recordTimer);
         recordTimer = null;
       }
       if (recorder && recorder.state !== "inactive") {
         try { recorder.stop(); } catch (_) {}
-      } else if (!save) {
-        recording = false;
-        document.getElementById("recordBtn").textContent = "录制";
-        document.getElementById("recordBtn").classList.remove("danger");
       }
     }
 
@@ -547,7 +747,7 @@
         return;
       }
       if (recording) {
-        stopRecord(true);
+        stopRecord();
         return;
       }
       const mime = pickMime();
@@ -602,7 +802,7 @@
         a.click();
         a.remove();
         setTimeout(() => URL.revokeObjectURL(url), 4000);
-        statusEl.textContent = "已导出视频，可到下载/文件里打开保存到相册";
+        statusEl.textContent = "已导出，可到下载/文件里保存到相册";
         statusEl.classList.remove("rec");
       };
 
@@ -611,10 +811,10 @@
       document.getElementById("pauseBtn").textContent = "暂停";
       document.getElementById("recordBtn").textContent = "停止";
       document.getElementById("recordBtn").classList.add("danger");
-      statusEl.textContent = "录制中… 约 6 秒后自动保存，也可点停止";
+      statusEl.textContent = "录制中… 约 6 秒后自动保存";
       statusEl.classList.add("rec");
       recorder.start(200);
-      recordTimer = setTimeout(() => stopRecord(true), 6000);
+      recordTimer = setTimeout(() => stopRecord(), 6000);
     }
 
     function setPresent(on) {
@@ -622,7 +822,6 @@
       resize();
     }
 
-    // events
     document.getElementById("pickBtn").onclick = () => fileInput.click();
     document.getElementById("uploadBtn").onclick = () => fileInput.click();
     fileInput.onchange = () => loadFile(fileInput.files?.[0]);
@@ -634,6 +833,7 @@
     document.getElementById("presentBtn").onclick = () => setPresent(true);
     document.getElementById("exitPresent").onclick = () => setPresent(false);
     document.getElementById("recordBtn").onclick = () => startRecord();
+    document.getElementById("openHelp").onclick = () => helpSheet.classList.add("show");
     document.getElementById("closeHelp").onclick = () => {
       helpSheet.classList.remove("show");
       localStorage.setItem("xuejing_help_ok", "1");
@@ -655,7 +855,6 @@
     window.addEventListener("resize", resize);
     window.addEventListener("orientationchange", () => setTimeout(resize, 250));
 
-    // first open tip
     if (!localStorage.getItem("xuejing_help_ok")) {
       helpSheet.classList.add("show");
     }
