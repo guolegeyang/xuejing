@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>雪景</title>
+  <style>
+    :root {
+      --bg: #0b1520;
+      --ink: #e8f0f7;
+      --dim: #9bb0c4;
+      --line: rgba(158, 201, 232, 0.28);
+      --accent: #c9e4f7;
+      --panel: rgba(10, 22, 34, 0.88);
+      --danger: #ff8a9b;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: linear-gradient(165deg, #0b1520, #152536 50%, #0d1a28);
+      color: var(--ink);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      overflow: hidden;
+    }
+    .app {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px max(10px, env(safe-area-inset-top));
+      flex-shrink: 0;
+    }
+    .brand {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+    }
+    .hint {
+      font-size: 0.75rem;
+      color: var(--dim);
+      max-width: 58%;
+      text-align: right;
+      line-height: 1.35;
+    }
+    .stage-wrap {
+      flex: 1;
+      min-height: 0;
+      padding: 0 12px;
+      display: flex;
+    }
+    .stage {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      background: #081018;
+      box-shadow: 0 18px 50px rgba(0,0,0,.45);
+      touch-action: none;
+    }
+    .placeholder {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      display: grid;
+      place-content: center;
+      gap: 10px;
+      text-align: center;
+      padding: 24px;
+      background: rgba(8,16,24,.55);
+    }
+    .placeholder p { margin: 0; }
+    .placeholder .t { font-size: 1.15rem; letter-spacing: .08em; }
+    .placeholder .s { color: var(--dim); font-size: .9rem; }
+    .pick {
+      margin-top: 8px;
+      justify-self: center;
+      padding: .75rem 1.35rem;
+      border: 1px solid var(--line);
+      background: rgba(158,201,232,.12);
+      color: var(--accent);
+      font: inherit;
+      font-size: .95rem;
+      border-radius: 0;
+    }
+    #view {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+    }
+    .bar {
+      flex-shrink: 0;
+      padding: 12px 12px max(14px, env(safe-area-inset-bottom));
+      display: grid;
+      gap: 10px;
+      background: var(--panel);
+      border-top: 1px solid var(--line);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .btn {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: rgba(158,201,232,.08);
+      color: var(--ink);
+      font: inherit;
+      font-size: .82rem;
+      padding: .7rem .4rem;
+      letter-spacing: .04em;
+    }
+    .btn:active { background: rgba(158,201,232,.2); }
+    .btn.primary {
+      background: rgba(180,220,255,.2);
+      border-color: rgba(200,230,255,.45);
+      color: #fff;
+    }
+    .btn.danger {
+      border-color: rgba(255,138,155,.45);
+      color: var(--danger);
+    }
+    .btn:disabled { opacity: .45; }
+    .sliders {
+      display: grid;
+      gap: 8px;
+    }
+    .slider {
+      display: grid;
+      grid-template-columns: 56px 1fr 36px;
+      align-items: center;
+      gap: 8px;
+      font-size: .78rem;
+      color: var(--dim);
+    }
+    .slider output {
+      text-align: right;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 3px;
+      background: rgba(158,201,232,.25);
+      border-radius: 99px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .status {
+      min-height: 1.1em;
+      font-size: .78rem;
+      color: var(--dim);
+      text-align: center;
+    }
+    .status.rec { color: var(--danger); }
+    body.is-present .top,
+    body.is-present .bar { display: none; }
+    body.is-present .stage-wrap { padding: 0; }
+    body.is-present .stage { box-shadow: none; }
+    .present-exit {
+      display: none;
+      position: fixed;
+      right: 12px;
+      top: max(12px, env(safe-area-inset-top));
+      z-index: 20;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,.45);
+      color: #fff;
+      padding: .55rem .8rem;
+      font: inherit;
+      font-size: .8rem;
+    }
+    body.is-present .present-exit { display: block; }
+    #fileInput { display: none; }
+    .sheet {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      background: rgba(0,0,0,.55);
+      padding: 24px 16px;
+      align-items: end;
+      justify-content: center;
+    }
+    .sheet.show { display: flex; }
+    .sheet-card {
+      width: min(420px, 100%);
+      background: #122233;
+      border: 1px solid var(--line);
+      padding: 18px 16px 16px;
+    }
+    .sheet-card h2 {
+      margin: 0 0 10px;
+      font-size: 1.05rem;
+      letter-spacing: .06em;
+    }
+    .sheet-card ol {
+      margin: 0 0 14px;
+      padding-left: 1.2em;
+      color: var(--dim);
+      font-size: .88rem;
+      line-height: 1.55;
+    }
+    .sheet-card .btn { width: 100%; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <div class="brand">雪景</div>
+      <p class="hint">上传照片 → 调雪 → 录制或全屏系统录屏</p>
+    </header>
+
+    <div class="stage-wrap">
+      <div class="stage" id="stage">
+        <canvas id="view"></canvas>
+        <div class="placeholder" id="placeholder">
+          <p class="t">放一张照片或视频</p>
+          <p class="s">雪花会在上层飘落</p>
+          <button class="pick" type="button" id="pickBtn">从相册选择</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bar">
+      <div class="row">
+        <button class="btn" type="button" id="uploadBtn">换图</button>
+        <button class="btn" type="button" id="pauseBtn">暂停</button>
+        <button class="btn" type="button" id="presentBtn">全屏</button>
+        <button class="btn primary" type="button" id="recordBtn">录制</button>
+      </div>
+      <div class="sliders">
+        <label class="slider">雪量 <input id="count" type="range" min="40" max="360" value="180" /><output id="countOut">180</output></label>
+        <label class="slider">速度 <input id="speed" type="range" min="0.3" max="2.2" step="0.1" value="0.85" /><output id="speedOut">0.9</output></label>
+        <label class="slider">风 <input id="wind" type="range" min="-2" max="2" step="0.1" value="0.25" /><output id="windOut">0.3</output></label>
+        <label class="slider">大小 <input id="size" type="range" min="0.5" max="2" step="0.1" value="1" /><output id="sizeOut">1.0</output></label>
+      </div>
+      <div class="status" id="status">录制约 6 秒，会下载成视频到相册/文件</div>
+    </div>
+  </div>
+
+  <button class="present-exit" type="button" id="exitPresent">退出全屏</button>
+  <input id="fileInput" type="file" accept="image/*,video/*" />
+
+  <div class="sheet" id="helpSheet">
+    <div class="sheet-card">
+      <h2>怎么放到手机上用</h2>
+      <ol>
+        <li>只需要这一个文件：<b>雪景.html</b></li>
+        <li>用隔空投送 / 微信 / 网盘发到手机</li>
+        <li>用 Safari 或 Chrome 打开（微信里可点「在浏览器打开」）</li>
+        <li>点「换图」选照片 → 调雪量 → 点「录制」</li>
+        <li>若录制失败（部分 iPhone）：点「全屏」，再用系统录屏</li>
+      </ol>
+      <button class="btn primary" type="button" id="closeHelp">知道了</button>
+    </div>
+  </div>
+
+  <script>
+  (() => {
+    const view = document.getElementById("view");
+    const ctx = view.getContext("2d", { alpha: false });
+    const stage = document.getElementById("stage");
+    const placeholder = document.getElementById("placeholder");
+    const fileInput = document.getElementById("fileInput");
+    const statusEl = document.getElementById("status");
+    const helpSheet = document.getElementById("helpSheet");
+
+    const countInput = document.getElementById("count");
+    const speedInput = document.getElementById("speed");
+    const windInput = document.getElementById("wind");
+    const sizeInput = document.getElementById("size");
+
+    const mediaImg = new Image();
+    const mediaVideo = document.createElement("video");
+    mediaVideo.playsInline = true;
+    mediaVideo.muted = true;
+    mediaVideo.loop = true;
+    mediaVideo.setAttribute("playsinline", "");
+    mediaVideo.setAttribute("webkit-playsinline", "");
+
+    let mediaType = null; // 'image' | 'video'
+    let objectUrl = null;
+    let flakes = [];
+    let w = 0, h = 0, dpr = 1;
+    let running = true;
+    let recording = false;
+    let recorder = null;
+    let chunks = [];
+    let recordTimer = null;
+
+    function rand(a, b) { return a + Math.random() * (b - a); }
+
+    function pickLayer() {
+      const t = Math.random();
+      if (t < 0.58) return rand(0.05, 0.32);
+      if (t < 0.88) return rand(0.32, 0.68);
+      return rand(0.68, 1);
+    }
+
+    function createFlake(fromTop) {
+      const layer = pickLayer();
+      const sizeScale = Number(sizeInput.value);
+      // Almost all soft dots; only occasionally a crystal flake
+      const kind = Math.random() < 0.012 ? "crystal" : "dot";
+      const r = kind === "crystal"
+        ? rand(3.2, 7.5 + layer * 5) * sizeScale
+        : rand(0.8 + layer * 0.5, 1.6 + layer * 4.2) * sizeScale;
+      const fall = rand(0.28 + layer * 0.7, 0.45 + layer * 1.15);
+      return {
+        x: rand(-20, (w || 1) + 20),
+        y: fromTop ? rand(-50, -6) : rand(0, h || 1),
+        r,
+        kind,
+        layer,
+        vy: fall,
+        vx: rand(-0.18, 0.18),
+        rot: rand(0, Math.PI * 2),
+        spin: rand(-0.02, 0.02) * (0.4 + layer),
+        wobble: rand(0, Math.PI * 2),
+        wobbleSpeed: rand(0.008, 0.03),
+        wobbleAmp: rand(0.12, 0.42) * (0.5 + layer),
+        opacity: Math.min(0.95, 0.5 + (1 - layer) * 0.35 + layer * 0.2),
+        soft: kind === "dot" && (layer > 0.55 || Math.random() < 0.3),
+        arms: 6,
+      };
+    }
+
+    function rebuild() {
+      const n = Number(countInput.value);
+      flakes = Array.from({ length: n }, () => createFlake(false));
+    }
+
+    function resize() {
+      const rect = stage.getBoundingClientRect();
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = Math.max(1, Math.floor(rect.width));
+      h = Math.max(1, Math.floor(rect.height));
+      view.width = Math.floor(w * dpr);
+      view.height = Math.floor(h * dpr);
+      view.style.width = w + "px";
+      view.style.height = h + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      rebuild();
+    }
+
+    function drawCover(source, sw, sh) {
+      if (!sw || !sh) return;
+      const scale = Math.max(w / sw, h / sh);
+      const dw = sw * scale;
+      const dh = sh * scale;
+      const dx = (w - dw) / 2;
+      const dy = (h - dh) / 2;
+      ctx.drawImage(source, dx, dy, dw, dh);
+    }
+
+    function drawMedia() {
+      ctx.fillStyle = "#081018";
+      ctx.fillRect(0, 0, w, h);
+      if (mediaType === "image" && mediaImg.complete && mediaImg.naturalWidth) {
+        drawCover(mediaImg, mediaImg.naturalWidth, mediaImg.naturalHeight);
+      } else if (mediaType === "video" && mediaVideo.readyState >= 2) {
+        drawCover(mediaVideo, mediaVideo.videoWidth, mediaVideo.videoHeight);
+      }
+    }
+
+    function drawDot(f) {
+      if (f.soft) {
+        const glow = f.r * (1.8 + f.layer * 0.7);
+        const g = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, glow);
+        g.addColorStop(0, `rgba(255,255,255,${f.opacity})`);
+        g.addColorStop(0.4, `rgba(255,255,255,${f.opacity * 0.5})`);
+        g.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, glow, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        const edge = Math.max(f.r * 1.4, f.r + 0.7);
+        const g = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, edge);
+        g.addColorStop(0, `rgba(255,255,255,${f.opacity})`);
+        g.addColorStop(0.55, `rgba(255,255,255,${f.opacity * 0.85})`);
+        g.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, edge, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function drawCrystal(f) {
+      ctx.save();
+      ctx.translate(f.x, f.y);
+      ctx.rotate(f.rot);
+      ctx.globalAlpha = f.opacity;
+      ctx.strokeStyle = "rgba(255,255,255,0.95)";
+      ctx.fillStyle = "rgba(255,255,255,0.95)";
+      ctx.lineWidth = Math.max(0.7, f.r * 0.08);
+      ctx.lineCap = "round";
+
+      const arm = f.r;
+      for (let i = 0; i < f.arms; i++) {
+        ctx.save();
+        ctx.rotate((Math.PI * 2 * i) / f.arms);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, -arm);
+        ctx.stroke();
+        // side branches
+        const b1 = arm * 0.42;
+        const b2 = arm * 0.68;
+        ctx.beginPath();
+        ctx.moveTo(0, -b1);
+        ctx.lineTo(-arm * 0.22, -b1 - arm * 0.16);
+        ctx.moveTo(0, -b1);
+        ctx.lineTo(arm * 0.22, -b1 - arm * 0.16);
+        ctx.moveTo(0, -b2);
+        ctx.lineTo(-arm * 0.16, -b2 - arm * 0.12);
+        ctx.moveTo(0, -b2);
+        ctx.lineTo(arm * 0.16, -b2 - arm * 0.12);
+        ctx.stroke();
+        ctx.restore();
+      }
+      ctx.beginPath();
+      ctx.arc(0, 0, Math.max(0.8, f.r * 0.1), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawFlake(f) {
+      if (f.kind === "crystal") drawCrystal(f);
+      else drawDot(f);
+    }
+
+    function tick() {
+      drawMedia();
+      if (running) {
+        const wind = Number(windInput.value);
+        const speed = Number(speedInput.value);
+        for (let i = 0; i < flakes.length; i++) {
+          const f = flakes[i];
+          f.wobble += f.wobbleSpeed;
+          f.rot += f.spin;
+          f.x += f.vx + wind * (0.25 + f.layer * 0.7) + Math.sin(f.wobble) * f.wobbleAmp;
+          f.y += f.vy * speed;
+          if (f.y - f.r > h + 10) flakes[i] = createFlake(true);
+          else {
+            if (f.x < -40) f.x = w + 40;
+            if (f.x > w + 40) f.x = -40;
+          }
+        }
+      }
+      for (let pass = 0; pass < 3; pass++) {
+        for (let i = 0; i < flakes.length; i++) {
+          const f = flakes[i];
+          const band = f.layer < 0.35 ? 0 : f.layer < 0.7 ? 1 : 2;
+          if (band === pass) drawFlake(f);
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+
+    function syncOut() {
+      document.getElementById("countOut").textContent = countInput.value;
+      document.getElementById("speedOut").textContent = Number(speedInput.value).toFixed(1);
+      document.getElementById("windOut").textContent = Number(windInput.value).toFixed(1);
+      document.getElementById("sizeOut").textContent = Number(sizeInput.value).toFixed(1);
+    }
+
+    function clearUrl() {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+        objectUrl = null;
+      }
+    }
+
+    function loadFile(file) {
+      if (!file) return;
+      clearUrl();
+      mediaVideo.pause();
+      objectUrl = URL.createObjectURL(file);
+      if (file.type.startsWith("video/")) {
+        mediaType = "video";
+        mediaVideo.src = objectUrl;
+        mediaVideo.play().catch(() => {});
+      } else {
+        mediaType = "image";
+        mediaImg.src = objectUrl;
+      }
+      placeholder.hidden = true;
+      statusEl.textContent = "已加载，可调雪后点「录制」";
+      statusEl.classList.remove("rec");
+    }
+
+    function pickMime() {
+      const list = [
+        "video/mp4;codecs=avc1.42E01E",
+        "video/mp4",
+        "video/webm;codecs=vp9",
+        "video/webm;codecs=vp8",
+        "video/webm",
+      ];
+      if (!window.MediaRecorder) return null;
+      for (const t of list) {
+        if (MediaRecorder.isTypeSupported(t)) return t;
+      }
+      return "";
+    }
+
+    function stopRecord(save) {
+      if (recordTimer) {
+        clearTimeout(recordTimer);
+        recordTimer = null;
+      }
+      if (recorder && recorder.state !== "inactive") {
+        try { recorder.stop(); } catch (_) {}
+      } else if (!save) {
+        recording = false;
+        document.getElementById("recordBtn").textContent = "录制";
+        document.getElementById("recordBtn").classList.remove("danger");
+      }
+    }
+
+    async function startRecord() {
+      if (!mediaType) {
+        statusEl.textContent = "请先上传一张照片或视频";
+        return;
+      }
+      if (recording) {
+        stopRecord(true);
+        return;
+      }
+      const mime = pickMime();
+      if (mime === null || typeof MediaRecorder === "undefined") {
+        statusEl.textContent = "当前浏览器不支持网页录制，请点「全屏」后用系统录屏";
+        statusEl.classList.add("rec");
+        return;
+      }
+
+      chunks = [];
+      let stream;
+      try {
+        stream = view.captureStream(30);
+      } catch (e) {
+        statusEl.textContent = "无法抓取画面，请用「全屏 + 系统录屏」";
+        return;
+      }
+
+      try {
+        recorder = mime ? new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 4500000 })
+          : new MediaRecorder(stream, { videoBitsPerSecond: 4500000 });
+      } catch (e) {
+        try {
+          recorder = new MediaRecorder(stream);
+        } catch (e2) {
+          statusEl.textContent = "录制初始化失败，请改用全屏系统录屏";
+          return;
+        }
+      }
+
+      recorder.ondataavailable = (e) => {
+        if (e.data && e.data.size) chunks.push(e.data);
+      };
+      recorder.onstop = () => {
+        recording = false;
+        document.getElementById("recordBtn").textContent = "录制";
+        document.getElementById("recordBtn").classList.remove("danger");
+        stream.getTracks().forEach((t) => t.stop());
+        if (!chunks.length) {
+          statusEl.textContent = "没有录到内容，可试全屏系统录屏";
+          statusEl.classList.remove("rec");
+          return;
+        }
+        const type = recorder.mimeType || "video/webm";
+        const blob = new Blob(chunks, { type });
+        const ext = type.includes("mp4") ? "mp4" : "webm";
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `雪景_${Date.now()}.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 4000);
+        statusEl.textContent = "已导出视频，可到下载/文件里打开保存到相册";
+        statusEl.classList.remove("rec");
+      };
+
+      recording = true;
+      running = true;
+      document.getElementById("pauseBtn").textContent = "暂停";
+      document.getElementById("recordBtn").textContent = "停止";
+      document.getElementById("recordBtn").classList.add("danger");
+      statusEl.textContent = "录制中… 约 6 秒后自动保存，也可点停止";
+      statusEl.classList.add("rec");
+      recorder.start(200);
+      recordTimer = setTimeout(() => stopRecord(true), 6000);
+    }
+
+    function setPresent(on) {
+      document.body.classList.toggle("is-present", on);
+      resize();
+    }
+
+    // events
+    document.getElementById("pickBtn").onclick = () => fileInput.click();
+    document.getElementById("uploadBtn").onclick = () => fileInput.click();
+    fileInput.onchange = () => loadFile(fileInput.files?.[0]);
+
+    document.getElementById("pauseBtn").onclick = () => {
+      running = !running;
+      document.getElementById("pauseBtn").textContent = running ? "暂停" : "继续";
+    };
+    document.getElementById("presentBtn").onclick = () => setPresent(true);
+    document.getElementById("exitPresent").onclick = () => setPresent(false);
+    document.getElementById("recordBtn").onclick = () => startRecord();
+    document.getElementById("closeHelp").onclick = () => {
+      helpSheet.classList.remove("show");
+      localStorage.setItem("xuejing_help_ok", "1");
+    };
+
+    ;[countInput, speedInput, windInput, sizeInput].forEach((el) => {
+      el.addEventListener("input", () => {
+        syncOut();
+        if (el === countInput || el === sizeInput) rebuild();
+      });
+    });
+
+    stage.addEventListener("dragover", (e) => e.preventDefault());
+    stage.addEventListener("drop", (e) => {
+      e.preventDefault();
+      loadFile(e.dataTransfer?.files?.[0]);
+    });
+
+    window.addEventListener("resize", resize);
+    window.addEventListener("orientationchange", () => setTimeout(resize, 250));
+
+    // first open tip
+    if (!localStorage.getItem("xuejing_help_ok")) {
+      helpSheet.classList.add("show");
+    }
+
+    syncOut();
+    resize();
+    tick();
+  })();
+  </script>
+</body>
+</html>
