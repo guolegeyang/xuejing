@@ -316,35 +316,36 @@
       animation: pulseText 1.2s ease-in-out infinite;
     }
 
-    body.is-present .top,
-    body.is-present .bar { display: none; }
+    body.is-present {
+      background: #000;
+    }
 
-    body.is-present .stage-wrap { padding: 0; }
+    body.is-present::before,
+    body.is-present .top,
+    body.is-present .bar,
+    body.is-present .sheet,
+    body.is-present .present-exit {
+      display: none !important;
+    }
+
+    body.is-present .app {
+      max-width: none;
+    }
+
+    body.is-present .stage-wrap {
+      padding: 0;
+    }
 
     body.is-present .stage {
       border: 0;
       box-shadow: none;
+      background: #000;
     }
 
-    body.is-present .stage::after { display: none; }
-
-    .present-exit {
+    body.is-present .stage::after {
       display: none;
-      position: fixed;
-      right: 14px;
-      top: var(--safe-top);
-      z-index: 20;
-      border: 1px solid var(--line);
-      background: rgba(8, 16, 26, 0.55);
-      color: #fff;
-      padding: 0.55rem 0.85rem;
-      font: inherit;
-      font-size: 0.78rem;
-      letter-spacing: 0.06em;
-      backdrop-filter: blur(10px);
     }
 
-    body.is-present .present-exit { display: block; }
 
     #fileInput { display: none; }
 
@@ -466,7 +467,6 @@
     </div>
   </div>
 
-  <button class="present-exit" type="button" id="exitPresent">退出全屏</button>
   <input id="fileInput" type="file" accept="image/*,video/*" />
 
   <div class="sheet" id="helpSheet">
@@ -817,8 +817,16 @@
       recordTimer = setTimeout(() => stopRecord(), 6000);
     }
 
+    let presenting = false;
+
     function setPresent(on) {
-      document.body.classList.toggle("is-present", on);
+      presenting = !!on;
+      document.body.classList.toggle("is-present", presenting);
+      if (presenting) {
+        statusEl.textContent = "全屏中：点一下画面即可退出";
+      } else {
+        statusEl.textContent = mediaType ? "已加载，调好雪后点「录制」" : "录制约 6 秒，完成后可保存到相册";
+      }
       resize();
     }
 
@@ -831,7 +839,9 @@
       document.getElementById("pauseBtn").textContent = running ? "暂停" : "继续";
     };
     document.getElementById("presentBtn").onclick = () => setPresent(true);
-    document.getElementById("exitPresent").onclick = () => setPresent(false);
+    stage.addEventListener("click", () => {
+      if (presenting) setPresent(false);
+    });
     document.getElementById("recordBtn").onclick = () => startRecord();
     document.getElementById("openHelp").onclick = () => helpSheet.classList.add("show");
     document.getElementById("closeHelp").onclick = () => {
